@@ -9,7 +9,7 @@
         /// </summary>
         /// <param name="path">The path to the demo file.</param>
         /// <param name="version">The version of the demo.</param>
-        public LocalDemo(string path, GameType version)
+        public LocalDemo(string path, GameVersion version)
         {
             Path = path;
             Version = version;
@@ -112,7 +112,7 @@
         /// <summary>
         ///     Gets the version of this instance.
         /// </summary>
-        public GameType Version { get; }
+        public GameVersion Version { get; }
 
         /// <summary>
         ///     Gets or sets the name of this instance.

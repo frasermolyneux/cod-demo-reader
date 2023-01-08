@@ -7,7 +7,7 @@ namespace XtremeIdiots.CallOfDuty.DemoReader
     public class DemoReader
     {
         private readonly Stream _demoStream;
-        private readonly GameType _gameVersion;
+        private readonly GameVersion _gameVersion;
         private readonly HuffmanTree _huffmanTree;
 
         /// <summary>
@@ -18,19 +18,19 @@ namespace XtremeIdiots.CallOfDuty.DemoReader
         /// <exception cref="ArgumentNullException">
         ///     Thrown if demoStream or extension is null.
         /// </exception>
-        public DemoReader(Stream demoStream, GameType gameVersion)
+        public DemoReader(Stream demoStream, GameVersion gameVersion)
         {
             _demoStream = demoStream ?? throw new ArgumentNullException(nameof(demoStream));
             _gameVersion = gameVersion;
 
             // Initialize the huffman tree.
             _huffmanTree =
-                new HuffmanTree(gameVersion == GameType.CallOfDuty2
+                new HuffmanTree(gameVersion == GameVersion.CallOfDuty2
                     ? HuffmanFrequencies.Quake3
                     : HuffmanFrequencies.CallOfDuty4);
 
             // Skip first byte.
-            if (_gameVersion == GameType.CallOfDuty4 || _gameVersion == GameType.CallOfDuty5)
+            if (_gameVersion == GameVersion.CallOfDuty4 || _gameVersion == GameVersion.CallOfDuty5)
                 _demoStream.Seek(1, SeekOrigin.Begin);
         }
 
@@ -115,7 +115,7 @@ namespace XtremeIdiots.CallOfDuty.DemoReader
 
                 var stringIdx = demoMessage.ReadInt16();
 
-                if (_gameVersion == GameType.CallOfDuty2)
+                if (_gameVersion == GameVersion.CallOfDuty2)
                 {
                     idx = stringIdx;
                     stringIdx = 1;
@@ -126,7 +126,7 @@ namespace XtremeIdiots.CallOfDuty.DemoReader
                     if (demoMessage.IsAtEndOfData)
                         break;
 
-                    if (_gameVersion != GameType.CallOfDuty2)
+                    if (_gameVersion != GameVersion.CallOfDuty2)
                     {
                         if (demoMessage.ReadAlignedBits(1) != 0)
                             idx++;

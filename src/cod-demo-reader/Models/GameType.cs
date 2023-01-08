@@ -1,6 +1,6 @@
 ﻿namespace XtremeIdiots.CallOfDuty.DemoReader.Models
 {
-    public enum GameType
+    public enum GameVersion
     {
         CallOfDuty2,
         CallOfDuty4,

@@ -2,7 +2,7 @@
 {
     public interface IDemo
     {
-        GameType Version { get; }
+        GameVersion Version { get; }
         string? Name { get; }
         DateTime Created { get; }
         string? Map { get; }
