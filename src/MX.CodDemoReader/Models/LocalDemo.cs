@@ -1,4 +1,4 @@
-﻿namespace XtremeIdiots.CallOfDuty.DemoReader.Models
+namespace MX.CodDemoReader.Models
 {
     public class LocalDemo : IDemo
     {
@@ -30,18 +30,18 @@
                     config.TryGetValue("sv_referencedFFNames", out var ffNames);
 
                     if (!string.IsNullOrWhiteSpace(mod) && mod.ToLower().StartsWith("mods/"))
-                        mod = mod.Substring(5);
+                        mod = mod[5..];
 
                     Map = map;
                     Mod = mod;
                     GameMode = gameType;
                     ServerName = server;
-                    IWDs = iwdNames == null ? new string[0] : iwdNames.Split(' ');
+                    IWDs = iwdNames == null ? Array.Empty<string>() : iwdNames.Split(' ');
                     FFs = ffNames == null
-                        ? new string[0]
+                        ? Array.Empty<string>()
                         : ffNames.Split(' ').Select(ff =>
                         {
-                            // Change path of usermaps files to full paths. 
+                            // Change path of usermaps files to full paths.
                             // e.g. usermaps/mp_caen2_load -> usermaps/mp_caen2/mp_caen2_load
 
                             if (!ff.StartsWith("usermaps/mp_"))
@@ -50,7 +50,7 @@
                             var mapName = ff.Split('/').Last();
                             if (mapName.EndsWith("_load"))
                             {
-                                mapName = mapName.Substring(0, mapName.Length - 5);
+                                mapName = mapName[..^5];
                                 return string.Format("usermaps/{0}/{0}_load", mapName);
                             }
 
@@ -64,8 +64,8 @@
                 Mod = "???";
                 GameMode = "???";
                 ServerName = "File corrupted!";
-                IWDs = new string[0];
-                FFs = new string[0];
+                IWDs = Array.Empty<string>();
+                FFs = Array.Empty<string>();
                 _isCorrupted = true;
             }
         }
@@ -73,7 +73,7 @@
         /// <summary>
         ///     Gets the path to the demo file.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; private set; }
 
         /// <summary>
         ///     Gets a collection of IWD files referenced by the demo.
@@ -90,14 +90,10 @@
         /// </summary>
         public bool IsValid => File.Exists(Path) && !_isCorrupted;
 
-        #region Overrides of Object
-
         public override string ToString()
         {
             return Name;
         }
-
-        #endregion
 
         /// <summary>
         ///     Deletes this demo file.
@@ -106,8 +102,6 @@
         {
             File.Delete(Path);
         }
-
-        #region Implementation of IDemo
 
         /// <summary>
         ///     Gets the version of this instance.
@@ -170,23 +164,11 @@
             return File.OpenRead(Path);
         }
 
-        #endregion
-
-        #region Equality members
-
         protected bool Equals(LocalDemo other)
         {
-            return string.Equals(Path, other.Path);
+            return string.Equals(Path, other.Path, StringComparison.Ordinal);
         }
 
-        /// <summary>
-        ///     Determines whether the specified <see cref="T:System.Object" /> is equal to the current
-        ///     <see cref="T:System.Object" />.
-        /// </summary>
-        /// <returns>
-        ///     true if the specified object  is equal to the current object; otherwise, false.
-        /// </returns>
-        /// <param name="obj">The object to compare with the current object. </param>
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -195,17 +177,9 @@
             return Equals((LocalDemo)obj);
         }
 
-        /// <summary>
-        ///     Serves as a hash function for a particular type.
-        /// </summary>
-        /// <returns>
-        ///     A hash code for the current <see cref="T:System.Object" />.
-        /// </returns>
         public override int GetHashCode()
         {
-            return Path != null ? Path.GetHashCode() : 0;
+            return Path.GetHashCode(StringComparison.Ordinal);
         }
-
-        #endregion
     }
 }

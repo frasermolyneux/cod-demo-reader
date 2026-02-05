@@ -1,8 +1,7 @@
-﻿using XtremeIdiots.CallOfDuty.DemoReader.Huffman;
-using XtremeIdiots.CallOfDuty.DemoReader.Models;
-using XtremeIdiots.CodDemos.Huffman;
+using MX.CodDemoReader.Huffman;
+using MX.CodDemoReader.Models;
 
-namespace XtremeIdiots.CallOfDuty.DemoReader
+namespace MX.CodDemoReader
 {
     public class DemoReader
     {

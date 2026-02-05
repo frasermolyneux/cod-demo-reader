@@ -1,4 +1,4 @@
-﻿namespace XtremeIdiots.CallOfDuty.DemoReader.Models
+namespace MX.CodDemoReader.Models
 {
     public interface IDemo
     {
