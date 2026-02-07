@@ -8,7 +8,7 @@ on:
       - completed
 
 
-permissions: read-all
+permissions: {}
 
 jobs:
   publish-nuget-packages:
