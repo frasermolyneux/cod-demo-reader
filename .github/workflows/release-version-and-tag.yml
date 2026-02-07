@@ -9,7 +9,7 @@ on:
       - 'src/**'
 
 
-permissions: read-all
+permissions: {}
 
 jobs:
   calculate-version:
