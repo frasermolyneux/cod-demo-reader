@@ -8,15 +8,16 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PackageId>MX.CodDemoReader</PackageId>
 	<AssemblyName>MX.CodDemoReader</AssemblyName>
-	<Authors>Fraser Molyneux</Authors>
-	<Company>MX</Company>
-	<Product>MX Cod Demo Reader</Product>
+	<Product>Molyneux.IO Cod Demo Reader</Product>
 	<Title>Call of Duty Huffman Demo Reader</Title>
 	<Description>Enables reading metadata from Call of Duty 2/4/5 Huffman demo files.</Description>
 	<PackageProjectUrl>https://github.com/frasermolyneux/cod-demo-reader</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/frasermolyneux/cod-demo-reader</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
-	<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
