@@ -1,5 +1,7 @@
 # Copilot Instructions
 
+> Shared conventions: see [`.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md`](../../.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md) for general .NET NuGet library standards (multi-targeting, packaging, versioning, CI/CD).
+
 - Purpose: C# library for reading Call of Duty 2/4/5 Huffman-compressed demo files and extracting server config metadata; ships as NuGet package `MX.CodDemoReader` (net9.0 + net10.0, packages produced on build).
 - Key entry points: `DemoReader` (decodes a stream, builds a `HuffmanTree` from `HuffmanFrequencies`, parses game-state strings), `DemoMessage` (bit-level reader/decoder), `LocalDemo` (IDemo implementation for on-disk demos), `IDemo`/`GameVersion` models.
 - Parsing flow: `DemoReader.ReadConfiguration()` reads the header (sequence + length), skips the first byte for CoD4/5, Huffman-decodes the message, then iterates command `2` blocks to pull key/value strings. Config strings start with `\`; `SplitConfigString` pairs them, deduping on first occurrence.
