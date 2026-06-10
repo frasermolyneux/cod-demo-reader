@@ -19,3 +19,6 @@ Please read the [contributing](CONTRIBUTING.md) guidance; this is a learning and
 
 ## Security
 Please read the [security](SECURITY.md) guidance; I am always open to security feedback through email or opening an issue.
+
+## Local dev: MCP wire-up
+This repo wires the `frasermolyneux-copilot` MCP server for AI coding agents (GitHub Copilot CLI, the Copilot coding agent, etc.). The Copilot setup workflow checks out [`frasermolyneux/.github-copilot`](https://github.com/frasermolyneux/.github-copilot) at tag `v0.1.0`, builds the MCP server (`mcp-server/`), and `.github/copilot/mcp_config.json` registers it for the coding agent. See [`.github-copilot/mcp-server/README.md`](https://github.com/frasermolyneux/.github-copilot/blob/v0.1.0/mcp-server/README.md) for the full tool surface, content-root resolution, and per-client wire-up snippets.

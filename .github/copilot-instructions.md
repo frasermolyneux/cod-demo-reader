@@ -12,3 +12,9 @@
 - Build/test: `dotnet build src/MX.CodDemoReader.sln` produces the package; `dotnet test src` currently runs no tests but stays for workflow compatibility.
 - Versioning/release: Nerdbank.GitVersioning via `version.json`; `release-version-and-tag.yml` creates tags, `release-publish-nuget.yml` pushes the package. Other workflows: `build-and-test.yml`, `pr-verify.yml`, `codequality.yml`, `copilot-setup-steps.yml`, `dependabot-automerge.yml`.
 - Guardrails: demo streams must be readable; decoding assumes little-endian ints; `ReadFromStream` throws on short reads. Keep exceptions clear and avoid altering Huffman frequency order to preserve decoding accuracy.
+
+## Org conventions via MCP (when available)
+
+If a `frasermolyneux-copilot` MCP server is configured in your client (`.vscode/mcp.json`, the GitHub Copilot coding-agent MCP config at `.github/copilot/mcp_config.json`, or an equivalent stdio MCP wire-up), **prefer its tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The tool surface is `list_instructions`, `get_instruction`, `search_instructions`, plus the matching `_prompts` and `_agents` equivalents (seven tools total). The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
+
+This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
