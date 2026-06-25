@@ -2,16 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build-debug",
+            "label": "dotnet: clean",
             "command": "dotnet",
-            "type": "shell",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/src/MX.CodDemoReader.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet: build",
+            "command": "dotnet",
+            "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "--configuration",
-                "Debug"
+                "${workspaceFolder}/src/MX.CodDemoReader.sln"
             ],
             "group": {
                 "kind": "build",
@@ -20,9 +26,35 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "build-release",
+            "label": "dotnet: test",
             "command": "dotnet",
-            "type": "shell",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "--filter",
+                "FullyQualifiedName!~IntegrationTests"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet: format",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "format",
+                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "--verify-no-changes"
+            ]
+        },
+        {
+            "label": "dotnet: build-release",
+            "command": "dotnet",
+            "type": "process",
             "args": [
                 "build",
                 "${workspaceFolder}/src/MX.CodDemoReader.sln",
@@ -34,30 +66,16 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test-debug",
+            "label": "dotnet: test-release",
             "command": "dotnet",
-            "type": "shell",
+            "type": "process",
             "args": [
                 "test",
                 "${workspaceFolder}/src/MX.CodDemoReader.sln",
                 "--configuration",
-                "Debug"
-            ],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "test-release",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                "test",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
-                "--configuration",
-                "Release"
+                "Release",
+                "--filter",
+                "FullyQualifiedName!~IntegrationTests"
             ],
             "problemMatcher": "$msCompile"
         }
