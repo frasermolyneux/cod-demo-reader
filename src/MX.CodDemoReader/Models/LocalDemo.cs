@@ -1,185 +1,205 @@
-namespace MX.CodDemoReader.Models
+namespace MX.CodDemoReader.Models;
+
+/// <summary>
+/// Represents a local on-disk demo file and its parsed metadata.
+/// </summary>
+public class LocalDemo : IDemo
 {
-    public class LocalDemo : IDemo
+    private bool IsCorrupted { get; }
+
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LocalDemo" /> class.
+    /// </summary>
+    /// <param name="path">The path to the demo file.</param>
+    /// <param name="version">The version of the demo.</param>
+    public LocalDemo(string path, GameVersion version)
     {
-        private readonly bool _isCorrupted;
+        Path = path;
+        Version = version;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="LocalDemo" /> class.
-        /// </summary>
-        /// <param name="path">The path to the demo file.</param>
-        /// <param name="version">The version of the demo.</param>
-        public LocalDemo(string path, GameVersion version)
+        try
         {
-            Path = path;
-            Version = version;
+            using var stream = Open();
+            var reader = new DemoReader(stream, Version);
 
-            try
+            var config = reader.ReadConfiguration();
+
+            _ = config.TryGetValue("mapname", out var map);
+            _ = config.TryGetValue("fs_game", out var mod);
+            _ = config.TryGetValue("g_gametype", out var gameType);
+            _ = config.TryGetValue("sv_hostname", out var server);
+            _ = config.TryGetValue("sv_referencedIwdNames", out var iwdNames);
+            _ = config.TryGetValue("sv_referencedFFNames", out var ffNames);
+
+            if (!string.IsNullOrWhiteSpace(mod) && mod.StartsWith("mods/", StringComparison.OrdinalIgnoreCase))
             {
-                using (var stream = Open())
+                mod = mod[5..];
+            }
+
+            Map = map;
+            Mod = mod;
+            GameMode = gameType;
+            ServerName = server;
+            IWDs = iwdNames == null ? [] : iwdNames.Split(' ');
+            FFs = ffNames == null
+                ? []
+                : ffNames.Split(' ').Select(ff =>
                 {
-                    var reader = new DemoReader(stream, Version);
+                    // Change path of usermaps files to full paths.
+                    // e.g. usermaps/mp_caen2_load -> usermaps/mp_caen2/mp_caen2_load
 
-                    var config = reader.ReadConfiguration();
+                    if (!ff.StartsWith("usermaps/mp_", StringComparison.Ordinal))
+                    {
+                        return ff;
+                    }
 
-                    config.TryGetValue("mapname", out var map);
-                    config.TryGetValue("fs_game", out var mod);
-                    config.TryGetValue("g_gametype", out var gameType);
-                    config.TryGetValue("sv_hostname", out var server);
-                    config.TryGetValue("sv_referencedIwdNames", out var iwdNames);
-                    config.TryGetValue("sv_referencedFFNames", out var ffNames);
+                    var mapName = ff.Split('/').Last();
+                    if (mapName.EndsWith("_load", StringComparison.Ordinal))
+                    {
+                        mapName = mapName[..^5];
+                        return $"usermaps/{mapName}/{mapName}_load";
+                    }
 
-                    if (!string.IsNullOrWhiteSpace(mod) && mod.ToLower().StartsWith("mods/"))
-                        mod = mod[5..];
-
-                    Map = map;
-                    Mod = mod;
-                    GameMode = gameType;
-                    ServerName = server;
-                    IWDs = iwdNames == null ? Array.Empty<string>() : iwdNames.Split(' ');
-                    FFs = ffNames == null
-                        ? Array.Empty<string>()
-                        : ffNames.Split(' ').Select(ff =>
-                        {
-                            // Change path of usermaps files to full paths.
-                            // e.g. usermaps/mp_caen2_load -> usermaps/mp_caen2/mp_caen2_load
-
-                            if (!ff.StartsWith("usermaps/mp_"))
-                                return ff;
-
-                            var mapName = ff.Split('/').Last();
-                            if (mapName.EndsWith("_load"))
-                            {
-                                mapName = mapName[..^5];
-                                return string.Format("usermaps/{0}/{0}_load", mapName);
-                            }
-
-                            return string.Format("usermaps/{0}/{0}", mapName);
-                        });
-                }
-            }
-            catch (Exception)
-            {
-                Map = "???";
-                Mod = "???";
-                GameMode = "???";
-                ServerName = "File corrupted!";
-                IWDs = Array.Empty<string>();
-                FFs = Array.Empty<string>();
-                _isCorrupted = true;
-            }
+                    return $"usermaps/{mapName}/{mapName}";
+                });
         }
-
-        /// <summary>
-        ///     Gets the path to the demo file.
-        /// </summary>
-        public string Path { get; private set; }
-
-        /// <summary>
-        ///     Gets a collection of IWD files referenced by the demo.
-        /// </summary>
-        public IEnumerable<string> IWDs { get; }
-
-        /// <summary>
-        ///     Gets a collection of FF files referenced by the demo.
-        /// </summary>
-        public IEnumerable<string> FFs { get; }
-
-        /// <summary>
-        ///     Gets a value indicating whether this instance is valid.
-        /// </summary>
-        public bool IsValid => File.Exists(Path) && !_isCorrupted;
-
-        public override string ToString()
+        catch (Exception)
         {
-            return Name;
+            Map = "???";
+            Mod = "???";
+            GameMode = "???";
+            ServerName = "File corrupted!";
+            IWDs = [];
+            FFs = [];
+            IsCorrupted = true;
         }
+    }
 
-        /// <summary>
-        ///     Deletes this demo file.
-        /// </summary>
-        public void Delete()
+    /// <summary>
+    ///     Gets the path to the demo file.
+    /// </summary>
+    public string Path { get; private set; }
+
+    /// <summary>
+    ///     Gets a collection of IWD files referenced by the demo.
+    /// </summary>
+    public IEnumerable<string> IWDs { get; }
+
+    /// <summary>
+    ///     Gets a collection of FF files referenced by the demo.
+    /// </summary>
+    public IEnumerable<string> FFs { get; }
+
+    /// <summary>
+    ///     Gets a value indicating whether this instance is valid.
+    /// </summary>
+    public bool IsValid => File.Exists(Path) && !IsCorrupted;
+
+    /// <summary>
+    /// Returns the display name for this demo.
+    /// </summary>
+    /// <returns>The demo name.</returns>
+    public override string ToString()
+    {
+        return Name;
+    }
+
+    /// <summary>
+    ///     Deletes this demo file.
+    /// </summary>
+    public void Delete()
+    {
+        File.Delete(Path);
+    }
+
+    /// <summary>
+    ///     Gets the version of this instance.
+    /// </summary>
+    public GameVersion Version { get; }
+
+    /// <summary>
+    ///     Gets or sets the name of this instance.
+    /// </summary>
+    public string Name
+    {
+        get => System.IO.Path.GetFileNameWithoutExtension(Path);
+        set
         {
-            File.Delete(Path);
+            var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path) ?? throw new InvalidOperationException(),
+                $"{value}{System.IO.Path.GetExtension(Path)}");
+
+            File.Move(Path, newPath);
+
+            Path = newPath;
         }
+    }
 
-        /// <summary>
-        ///     Gets the version of this instance.
-        /// </summary>
-        public GameVersion Version { get; }
+    /// <summary>
+    ///     Gets the UTC date this instance was recorded at.
+    /// </summary>
+    public DateTime Created => File.GetCreationTimeUtc(Path);
 
-        /// <summary>
-        ///     Gets or sets the name of this instance.
-        /// </summary>
-        public string Name
-        {
-            get => System.IO.Path.GetFileNameWithoutExtension(Path);
-            set
-            {
-                var newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path) ?? throw new InvalidOperationException(),
-                    $"{value}{System.IO.Path.GetExtension(Path)}");
+    /// <summary>
+    ///     Gets the map this instance was recorded in.
+    /// </summary>
+    public string? Map { get; }
 
-                File.Move(Path, newPath);
+    /// <summary>
+    ///     Gets the mod this instance was recorded in.
+    /// </summary>
+    public string? Mod { get; }
 
-                Path = newPath;
-            }
-        }
+    /// <summary>
+    ///     Gets the game type this instance was recorded in.
+    /// </summary>
+    public string? GameMode { get; }
 
-        /// <summary>
-        ///     Gets the UTC date this instance was recorded at.
-        /// </summary>
-        public DateTime Created => File.GetCreationTimeUtc(Path);
+    /// <summary>
+    ///     Gets the server this instance was recorded on.
+    /// </summary>
+    public string? ServerName { get; }
 
-        /// <summary>
-        ///     Gets the map this instance was recorded in.
-        /// </summary>
-        public string? Map { get; }
+    /// <summary>
+    ///     Gets the size of the file.
+    /// </summary>
+    public long FileSize => new FileInfo(Path).Length;
 
-        /// <summary>
-        ///     Gets the mod this instance was recorded in.
-        /// </summary>
-        public string? Mod { get; }
+    /// <summary>
+    ///     Opens a stream of the demo file.
+    /// </summary>
+    /// <returns>The stream of the demo file.</returns>
+    public Stream Open()
+    {
+        return File.OpenRead(Path);
+    }
 
-        /// <summary>
-        ///     Gets the game type this instance was recorded in.
-        /// </summary>
-        public string? GameMode { get; }
+    /// <summary>
+    /// Determines whether this demo equals another demo by path.
+    /// </summary>
+    /// <param name="other">The other demo to compare.</param>
+    /// <returns><see langword="true" /> when both demos refer to the same path; otherwise, <see langword="false" />.</returns>
+    protected bool Equals(LocalDemo other)
+    {
+        return string.Equals(Path, other.Path, StringComparison.Ordinal);
+    }
 
-        /// <summary>
-        ///     Gets the server this instance was recorded on.
-        /// </summary>
-        public string? ServerName { get; }
+    /// <summary>
+    /// Determines whether this instance and a specified object are equal.
+    /// </summary>
+    /// <param name="obj">The object to compare with this instance.</param>
+    /// <returns><see langword="true" /> if the objects are equal; otherwise, <see langword="false" />.</returns>
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || (obj is LocalDemo other && obj.GetType() == GetType() && Equals(other));
+    }
 
-        /// <summary>
-        ///     Gets the size of the file.
-        /// </summary>
-        public long FileSize => new FileInfo(Path).Length;
-
-        /// <summary>
-        ///     Opens a stream of the demo file.
-        /// </summary>
-        /// <returns>The stream of the demo file.</returns>
-        public Stream Open()
-        {
-            return File.OpenRead(Path);
-        }
-
-        protected bool Equals(LocalDemo other)
-        {
-            return string.Equals(Path, other.Path, StringComparison.Ordinal);
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((LocalDemo)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Path.GetHashCode(StringComparison.Ordinal);
-        }
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for this instance.</returns>
+    public override int GetHashCode()
+    {
+        return Path.GetHashCode(StringComparison.Ordinal);
     }
 }
