@@ -1,14 +1,29 @@
 # Copilot Instructions
 
-> Shared conventions: see [`.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md`](../../.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md) for general .NET NuGet library standards (multi-targeting, packaging, versioning, CI/CD).
+This repository publishes `MX.CodDemoReader`, a library for decoding Call of Duty 2, 4, and 5 demo streams and extracting configuration metadata.
 
-- Purpose: C# library for reading Call of Duty 2/4/5 Huffman-compressed demo files and extracting server config metadata; ships as NuGet package `MX.CodDemoReader` (net9.0 + net10.0, packages produced on build).
-- Key entry points: `DemoReader` (decodes a stream, builds a `HuffmanTree` from `HuffmanFrequencies`, parses game-state strings), `DemoMessage` (bit-level reader/decoder), `LocalDemo` (IDemo implementation for on-disk demos), `IDemo`/`GameVersion` models.
-- Parsing flow: `DemoReader.ReadConfiguration()` reads the header (sequence + length), skips the first byte for CoD4/5, Huffman-decodes the message, then iterates command `2` blocks to pull key/value strings. Config strings start with `\`; `SplitConfigString` pairs them, deduping on first occurrence.
-- Game differences: Call of Duty 2 uses the Quake3 frequency table and no initial skip; Call of Duty 4/5 use the CoD4 table and skip one leading byte before decoding. Keep the frequency arrays at length 256.
-- DemoMessage details: `ReadAlignedBits` advances `_readBits`/`_readPosition`; `Decode` walks the Huffman tree and writes to a new `DemoMessage` until full. Be careful to maintain `CurrentSize` and alignment when changing bit-level reads.
-- LocalDemo behavior: opens the file, uses `DemoReader` to populate map/mod/gametype/server, tracks referenced IWD/FF files, normalizes usermaps paths (e.g., `usermaps/mp_caen2_load` => `usermaps/mp_caen2/mp_caen2_load`), and flags corrupted files by setting placeholder fields.
-- Usage pattern: open a stream from a demo, choose `GameVersion` explicitly, then call `ReadConfiguration()` to get a `Dictionary<string,string>` keyed by config cvars (`mapname`, `fs_game`, `g_gametype`, `sv_hostname`, etc.).
-- Build/test: `dotnet build src/MX.CodDemoReader.sln` produces the package; `dotnet test src` currently runs no tests but stays for workflow compatibility.
-- Versioning/release: Nerdbank.GitVersioning via `version.json`; `release-version-and-tag.yml` creates tags, `release-publish-nuget.yml` pushes the package. Other workflows: `build-and-test.yml`, `pr-verify.yml`, `codequality.yml`, `copilot-setup-steps.yml`, `dependabot-automerge.yml`.
-- Guardrails: demo streams must be readable; decoding assumes little-endian ints; `ReadFromStream` throws on short reads. Keep exceptions clear and avoid altering Huffman frequency order to preserve decoding accuracy.
+## Runtime and layout
+
+- SDK: `10.0.301` from `global.json`; the package targets `net9.0` and `net10.0`.
+- Solution: `src/MX.CodDemoReader.sln`.
+- Implementation and package project: `src/MX.CodDemoReader`.
+- There is currently no test project.
+
+## Repository rules
+
+- Call of Duty 2 uses the Quake 3 frequency table without the Call of Duty 4/5 leading-byte skip.
+- Call of Duty 4 and 5 use the Call of Duty 4 frequency table and skip the leading byte before decoding.
+- Preserve bit-position accounting in `DemoMessage`, little-endian integer reads, clear short-read exceptions, and the exact order and length of both 256-entry frequency arrays.
+- Preserve `LocalDemo` path normalization and corrupted-file behavior unless the task explicitly changes those contracts.
+- Public readers and models are NuGet consumer contracts.
+- Package ID, target frameworks, package metadata, and NBGV configuration in `version.json` are release boundaries.
+
+## Validation
+
+```pwsh
+dotnet build src/MX.CodDemoReader.sln
+dotnet test src/MX.CodDemoReader.sln
+dotnet format src/MX.CodDemoReader.sln --verify-no-changes
+```
+
+See `docs/overview.md` for the decoding model and supported games.
