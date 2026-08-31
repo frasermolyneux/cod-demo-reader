@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln"
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -17,7 +17,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln"
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx"
             ],
             "group": {
                 "kind": "build",
@@ -31,7 +31,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx",
                 "--filter",
                 "FullyQualifiedName!~IntegrationTests"
             ],
@@ -47,7 +47,7 @@
             "type": "process",
             "args": [
                 "format",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx",
                 "--verify-no-changes"
             ]
         },
@@ -57,7 +57,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
                 "--configuration",
@@ -71,7 +71,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/src/MX.CodDemoReader.sln",
+                "${workspaceFolder}/src/MX.CodDemoReader.slnx",
                 "--configuration",
                 "Release",
                 "--filter",
