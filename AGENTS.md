@@ -4,16 +4,16 @@
 
 ## Locations
 
-- Solution: `src/MX.CodDemoReader.sln`
+- Solution: `src/MX.CodDemoReader.slnx`
 - Library and package: `src/MX.CodDemoReader`
 - Documentation: `docs/`
 
 ## Commands
 
 ```pwsh
-dotnet build src/MX.CodDemoReader.sln
-dotnet test src/MX.CodDemoReader.sln
-dotnet format src/MX.CodDemoReader.sln --verify-no-changes
+dotnet build src/MX.CodDemoReader.slnx
+dotnet test src/MX.CodDemoReader.slnx
+dotnet format src/MX.CodDemoReader.slnx --verify-no-changes
 ```
 
 The repository currently has no test project; the test command is retained for solution and workflow compatibility.

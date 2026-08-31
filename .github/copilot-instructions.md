@@ -5,7 +5,7 @@ This repository publishes `MX.CodDemoReader`, a library for decoding Call of Dut
 ## Runtime and layout
 
 - SDK: `10.0.301` from `global.json`; the package targets `net9.0` and `net10.0`.
-- Solution: `src/MX.CodDemoReader.sln`.
+- Solution: `src/MX.CodDemoReader.slnx`.
 - Implementation and package project: `src/MX.CodDemoReader`.
 - There is currently no test project.
 
@@ -21,9 +21,9 @@ This repository publishes `MX.CodDemoReader`, a library for decoding Call of Dut
 ## Validation
 
 ```pwsh
-dotnet build src/MX.CodDemoReader.sln
-dotnet test src/MX.CodDemoReader.sln
-dotnet format src/MX.CodDemoReader.sln --verify-no-changes
+dotnet build src/MX.CodDemoReader.slnx
+dotnet test src/MX.CodDemoReader.slnx
+dotnet format src/MX.CodDemoReader.slnx --verify-no-changes
 ```
 
 See `docs/overview.md` for the decoding model and supported games.

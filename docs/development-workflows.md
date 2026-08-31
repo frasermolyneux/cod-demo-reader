@@ -1,7 +1,7 @@
 # Development Workflows
 
 ## Local build and test
-- Restore, build, and pack in one step: `dotnet build src/MX.CodDemoReader.sln` (multi-targets net9.0 and net10.0 and produces the NuGet package on build).
+- Restore, build, and pack in one step: `dotnet build src/MX.CodDemoReader.slnx` (multi-targets net9.0 and net10.0 and produces the NuGet package on build).
 - Tests are currently absent but `dotnet test src` is kept for workflow compatibility.
 
 ## Versioning and releases
