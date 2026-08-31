@@ -2,7 +2,7 @@
 
 ## Local build and test
 - Restore, build, and pack in one step: `dotnet build src/MX.CodDemoReader.slnx` (multi-targets net9.0 and net10.0 and produces the NuGet package on build).
-- Tests are currently absent but `dotnet test src` is kept for workflow compatibility.
+- Tests are currently absent but `dotnet test src/MX.CodDemoReader.slnx` is kept for workflow compatibility.
 
 ## Versioning and releases
 - Versioning is managed by Nerdbank.GitVersioning via `version.json`; semantic versions are derived from commit height and tags.
