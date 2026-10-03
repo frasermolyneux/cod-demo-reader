@@ -119,7 +119,7 @@ public class DemoReader
                 break;
             }
 
-            var stringIdx = demoMessage.ReadInt16();
+            var stringIdx = (ushort)demoMessage.ReadInt16();
 
             if (_gameVersion == GameVersion.CallOfDuty2)
             {
@@ -136,13 +136,13 @@ public class DemoReader
 
                 if (_gameVersion != GameVersion.CallOfDuty2)
                 {
-                    if (demoMessage.ReadAlignedBits(1) != 0)
+                    if (demoMessage.ReadBits(1) != 0)
                     {
                         idx++;
                     }
                     else
                     {
-                        idx = demoMessage.ReadAlignedBits(12);
+                        idx = demoMessage.ReadBits(12);
                     }
                 }
 
