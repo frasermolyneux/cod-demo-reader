@@ -136,13 +136,13 @@ public class DemoReader
 
                 if (_gameVersion != GameVersion.CallOfDuty2)
                 {
-                    if (demoMessage.ReadAlignedBits(1) != 0)
+                    if (demoMessage.ReadBits(1) != 0)
                     {
                         idx++;
                     }
                     else
                     {
-                        idx = demoMessage.ReadAlignedBits(12);
+                        idx = demoMessage.ReadBits(12);
                     }
                 }
 

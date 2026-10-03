@@ -1,3 +1,4 @@
+using MX.CodDemoReader.Huffman;
 using MX.CodDemoReader.Models;
 
 namespace MX.CodDemoReader.Tests;
@@ -24,6 +25,30 @@ public class DemoMessageTests
         _ = message.ReadByte();
 
         _ = Assert.Throws<EndOfStreamException>(() => message.ReadByte());
+    }
+
+    [Fact]
+    public void PackedBitReadsHonorCountAndByteReadsRealign()
+    {
+        var message = CreateMessage(0b1010_1101, 0x34);
+
+        Assert.Equal(0b101, message.ReadAlignedBits(3));
+        Assert.Equal(0b10101, message.ReadAlignedBits(5));
+        Assert.Equal(0x34, message.ReadByte());
+    }
+
+    [Fact]
+    public void DecodeUsesOnlyActivePayload()
+    {
+        var expected = CreateMessage(0b1010_1101);
+        var padded = CreateMessage(0b1010_1101, 0xff);
+        padded.CurrentSize = 1;
+        var tree = new HuffmanTree(HuffmanFrequencies.CallOfDuty4);
+
+        var expectedDecoded = expected.Decode(tree);
+        var paddedDecoded = padded.Decode(tree);
+
+        Assert.Equal(expectedDecoded.Data, paddedDecoded.Data);
     }
 
     private static DemoMessage CreateMessage(params byte[] data)

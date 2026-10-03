@@ -8,7 +8,7 @@ public static class HuffmanFrequencies
     /// <summary>
     /// Gets the Quake 3 frequency table used by Call of Duty 2 demos.
     /// </summary>
-    public static readonly int[] Quake3 =
+    public static int[] Quake3 =>
     [
             250315, // 0
             41193, // 1
@@ -271,7 +271,7 @@ public static class HuffmanFrequencies
     /// <summary>
     /// Gets the frequency table used by Call of Duty 4 and 5 demos.
     /// </summary>
-    public static readonly int[] CallOfDuty4 =
+    public static int[] CallOfDuty4 =>
     [
             274054,
             68777,

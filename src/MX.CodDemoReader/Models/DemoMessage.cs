@@ -36,27 +36,33 @@ public class DemoMessage(int length)
     /// <summary>
     /// Reads a single byte from the current aligned position.
     /// </summary>
-    /// <returns>The read value, or <c>0</c> when there is insufficient data.</returns>
+    /// <returns>The read value.</returns>
+    /// <exception cref="EndOfStreamException">There is insufficient data remaining.</exception>
     public byte ReadByte()
     {
+        AlignReadPointer();
         return (byte)ReadBits(8);
     }
 
     /// <summary>
     /// Reads a 16-bit integer from the current aligned position.
     /// </summary>
-    /// <returns>The read value, or <c>0</c> when there is insufficient data.</returns>
+    /// <returns>The read value.</returns>
+    /// <exception cref="EndOfStreamException">There is insufficient data remaining.</exception>
     public short ReadInt16()
     {
+        AlignReadPointer();
         return (short)ReadBits(16);
     }
 
     /// <summary>
     /// Reads a 32-bit integer from the current aligned position.
     /// </summary>
-    /// <returns>The read value, or <c>0</c> when there is insufficient data.</returns>
+    /// <returns>The read value.</returns>
+    /// <exception cref="EndOfStreamException">There is insufficient data remaining.</exception>
     public int ReadInt32()
     {
+        AlignReadPointer();
         return ReadBits(32);
     }
 
@@ -89,10 +95,16 @@ public class DemoMessage(int length)
     /// </summary>
     /// <param name="count">The number of bits to read.</param>
     /// <returns>The read value.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="count"/> is less than one or greater than eight.
+    /// </exception>
+    /// <exception cref="EndOfStreamException">There is insufficient data remaining.</exception>
     public byte ReadAlignedBits(int count)
     {
-        _ = count;
-        return ReadByte();
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, 8);
+
+        return (byte)ReadBits(count);
     }
 
     /// <summary>
@@ -108,7 +120,7 @@ public class DemoMessage(int length)
         var decoded = new List<byte>();
         var node = huffmanTree.Root;
 
-        foreach (bool bit in new BitArray(Data))
+        foreach (bool bit in new BitArray(Data[..CurrentSize]))
         {
             node = (bit ? node.OneChild : node.ZeroChild) ?? throw new InvalidDataException("Missing node in the tree");
             if (node.Value == null)
@@ -123,7 +135,7 @@ public class DemoMessage(int length)
         return new DemoMessage([.. decoded]);
     }
 
-    private int ReadBits(int bits)
+    internal int ReadBits(int bits)
     {
         var value = 0;
 
@@ -147,5 +159,16 @@ public class DemoMessage(int length)
         }
 
         return value;
+    }
+
+    private void AlignReadPointer()
+    {
+        if (_bit == 0)
+        {
+            return;
+        }
+
+        _bit = 0;
+        _readCount++;
     }
 }
