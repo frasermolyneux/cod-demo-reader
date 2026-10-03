@@ -31,8 +31,8 @@ public class HuffmanTree(int[] frequencies)
 
             var newNode = new HuffmanNode
             {
-                OneChild = first,
-                ZeroChild = second,
+                ZeroChild = first,
+                OneChild = second,
                 Frequency = first.Frequency + second.Frequency
             };
 
