@@ -6,7 +6,7 @@
 
 ## Versioning and releases
 - Versioning is managed by Nerdbank.GitVersioning via `version.json`; semantic versions are derived from commit height and tags.
-- Release workflows run in two stages: `release-version-and-tag.yml` generates tags and `release-publish-nuget.yml` publishes the package to NuGet using those tags.
+- Release workflows run in two stages: `release-version-and-tag.yml` generates tags and `release-publish-nuget.yml` publishes the package to NuGet using those tags. NuGet publishing uses OIDC Trusted Publishing with the `NUGET_USER` variable in the `NuGet` environment instead of a stored API key.
 
 ## GitHub workflows
 - `build-and-test.yml` builds the solution and runs the regression tests.
